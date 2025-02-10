@@ -1,0 +1,21 @@
+services:
+  db:
+    build: .
+    container_name: mongo
+    ports:
+      - "27017:27017"
+    networks:
+      - challenge-net
+  server:
+    build: ./src/problem5
+    ports:
+      - "4000:4000"
+    networks:
+      - challenge-net
+    depends_on:
+      - db
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/challenge-api
+
+networks:
+  challenge-net: {}
