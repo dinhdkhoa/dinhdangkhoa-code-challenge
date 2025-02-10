@@ -1,0 +1,103 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  height: 100%;
+  line-height: 1.2;
+}
+
+body {
+  font-family: 'Helvetica Neue', Arial, Helvetica, sans-serif;
+  font-weight: 400;
+}
+
+@layer base {
+  :root {
+    --navbar-height: 56px;
+
+    --background: 0 0% 100%;
+    --background-2: 345 100% 77%;
+    --foreground: 220 50% 4.71%;
+
+    --primary: 218.4 52.3% 46.86%;
+    --primary-foreground: 216.92 48.15% 94.71%;
+
+    --card: 220 42.86% 97.25%;
+    --card-foreground: 220 50% 4.71%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 50% 4.71%;
+
+    --secondary: 217.89 46.34% 91.96%;
+    --secondary-foreground: 0 0% 0%;
+
+    --muted: 216.92 48.15% 94.71%;
+    --muted-foreground: 0 0% 40%;
+
+    --accent: 216.92 48.15% 94.71%;
+    --accent-foreground: 220 50% 7.06%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 218.4 45.45% 89.22%;
+    --input: 217.5 16.33% 80.78%;
+    --ring: 218.4 52.3% 46.86%;
+
+    --chart-1: 218.4 52.3% 46.86%;
+    --chart-2: 218.49 46.09% 54.9%;
+    --chart-3: 218.05 46.59% 65.49%;
+    --chart-4: 218.26 46.31% 70.78%;
+    --chart-5: 218.57 45.9% 76.08%;
+
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 0 0% 0%;
+    --foreground: 217.89 46.34% 91.96%;
+
+    --primary: 218.4 52.3% 46.86%;
+    --primary-foreground: 216.92 48.15% 94.71%;
+
+    --card: 216 17.24% 5.69%;
+    --card-foreground: 217.89 46.34% 91.96%;
+
+    --popover: 0 0% 0%;
+    --popover-foreground: 217.89 46.34% 91.96%;
+
+    --secondary: 218.18 52.38% 16.47%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 0 0% 9.8%;
+    --muted-foreground: 0 0% 50.2%;
+
+    --accent: 218.18 52.38% 16.47%;
+    --accent-foreground: 217.89 46.34% 91.96%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 218.4 53.19% 9.22%;
+    --input: 220 12% 19.61%;
+    --ring: 218.4 52.3% 46.86%;
+
+    --chart-1: 218.4 52.3% 46.86%;
+    --chart-2: 218.13 52.71% 39.8%;
+    --chart-3: 218.52 52.26% 30.39%;
+    --chart-4: 218.26 52.67% 25.69%;
+    --chart-5: 218.57 51.85% 21.18%;
+
+    --radius: 0.5rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
