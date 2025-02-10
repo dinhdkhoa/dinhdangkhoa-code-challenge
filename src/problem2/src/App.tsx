@@ -1,7 +1,8 @@
 import './App.css'
+import MainLayout from './components/layout'
 
 function App() {
-  return <div>Vite + Tailwind</div>
+  return <MainLayout />
 }
 
 export default App
