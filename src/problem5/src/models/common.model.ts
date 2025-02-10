@@ -1,5 +1,5 @@
 export interface GetMockDataResType {
   currency: string
-  date: string
+  date?: Date
   price: number
 }

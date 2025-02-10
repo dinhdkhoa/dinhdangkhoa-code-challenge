@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import { tokenControllers } from '~/controllers'
+import { errorHandler } from '~/utils/error-handlers'
 
 const router = Router()
 
@@ -8,10 +9,10 @@ const router = Router()
  * Path: /
  * Method: GET
  */
-router.get('', tokenControllers.getTokens)
-router.post('', tokenControllers.getTokens)
-router.patch('/:tokenId', tokenControllers.getTokens)
-router.delete('/:tokenId', tokenControllers.getTokens)
+router.get('', errorHandler(tokenControllers.getTokens))
+router.post('/', tokenControllers.addTokenValidator, errorHandler(tokenControllers.addToken))
+router.patch('/:tokenId', tokenControllers.tokenIdParamValidator, errorHandler(tokenControllers.updateToken))
+router.delete('/:tokenId', tokenControllers.tokenIdParamValidator, errorHandler(tokenControllers.deleteToken))
 
 const tokenRouter = router
 

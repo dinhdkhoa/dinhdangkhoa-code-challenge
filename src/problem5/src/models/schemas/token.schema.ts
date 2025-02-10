@@ -6,6 +6,8 @@ interface TokenInterface extends GetMockDataResType {
   image?: string
 }
 
+export type TokenRequestBody = Pick<TokenInterface, 'currency' | 'price' | 'image'>
+
 export default class Token {
   _id: ObjectId
   currency: string
@@ -16,7 +18,7 @@ export default class Token {
   constructor({ _id, currency, date, price, image }: TokenInterface) {
     this._id = _id || new ObjectId()
     this.currency = currency
-    this.date = new Date(date)
+    this.date = date ?? new Date()
     this.price = price
     this.image = image
   }

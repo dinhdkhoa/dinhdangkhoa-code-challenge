@@ -1,11 +1,8 @@
-import { Request, Response, Router } from 'express'
-import collections from '~/database/collections'
+import { Router } from 'express'
+import tokenRouter from './token.routes'
 
 const router = Router()
-router.use('/token', async (request: Request, res: Response) => {
-  const data = await collections.token.find().toArray()
-  res.json({ data })
-})
+router.use('/token', tokenRouter)
 
 const routes = router
 
