@@ -19,7 +19,10 @@ export const http = async <ResponseType>({body,method , route} : RequestParams) 
     throw new Error(response.statusText)
   }
 
-  const payload : ResponseType  = await response.json()
+  const payload : {
+    message?: string,
+    data: ResponseType
+  }  = await response.json()
 
   return payload
 }

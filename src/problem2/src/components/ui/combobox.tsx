@@ -1,80 +1,63 @@
-import { Check, ChevronsUpDown } from 'lucide-react'
-import * as React from 'react'
-
+import { Button } from '@/components/ui/button'
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { Button } from '@/components/ui/button'
-import { Avatar, AvatarFallback, AvatarImage } from './avatar'
-import { useGetTokens } from '@/hooks/query/useGetTokens.query'
+import { cn } from '@/lib/utils'
+import { ChevronsUpDown } from 'lucide-react'
+import * as React from 'react'
+import ComboboxImage from '../combobox-image'
 
-const frameworks = [
-  {
-    value: 'next.js',
-    label: 'Next.js'
-  },
-  {
-    value: 'sveltekit',
-    label: 'SvelteKit'
-  },
-  {
-    value: 'nuxt.js',
-    label: 'Nuxt.js'
-  },
-  {
-    value: 'remix',
-    label: 'Remix'
-  },
-  {
-    value: 'astro',
-    label: 'Astro'
-  }
-]
+export type ComboboxDataType<T = any> = {
+  value: string;
+  label: string;
+  image?: string
+  data?: T
+}
 
-export function Combobox() {
-  const { data } = useGetTokens()
+interface ComboboxProps {
+  className?: string | undefined
+  data: ComboboxDataType[]
+  placeholder?: string,
+  cb?: (value: ComboboxDataType['data']) => void
+}
 
+export function Combobox({ data, className, cb, placeholder = 'Search Data...' }: ComboboxProps) {
   const [open, setOpen] = React.useState(false)
   const [value, setValue] = React.useState('')
+
+  const currentTtem = data.find((data) => data.value === value)
+
+  const handleSelect = (newValue: string) => {
+    setValue(newValue === value ? '' : newValue)
+    setOpen(false)
+    cb && cb(data.find((data) => data.value === newValue)!.data)
+  }
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button variant="outline" role="combobox" aria-expanded={open} className="w-[200px] justify-between">
-          {value ? (
-            <>
-              <Avatar className={'mr-1 h-6 w-6'}>
-                <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-                <AvatarFallback>{frameworks.find((framework) => framework.value === value)?.label}</AvatarFallback>
-              </Avatar>
-              {frameworks.find((framework) => framework.value === value)?.label}
-            </>
+        <Button variant="outline" role="combobox" aria-expanded={open} className={cn("min-w-40 2xl:min-w-[266px] justify-between ", className)}>
+          {currentTtem ? (
+            <ComboboxImage value={currentTtem} />
           ) : (
-            'Select token...'
+            placeholder
           )}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="min-w-fit p-0">
+      <PopoverContent className="min-w-40 lg:min-w-[266px] 2xl:min-w-[376px] p-0">
         <Command>
-          <CommandInput placeholder="Search framework..." />
+          <CommandInput placeholder={placeholder} />
           <CommandList>
-            <CommandEmpty>No framework found.</CommandEmpty>
+            <CommandEmpty>No Data</CommandEmpty>
             <CommandGroup>
-              {frameworks.map((framework) => (
+              {data.map((data) => (
                 <CommandItem
-                  key={framework.value}
-                  value={framework.value}
-                  onSelect={(currentValue) => {
-                    setValue(currentValue === value ? '' : currentValue)
-                    setOpen(false)
-                  }}
-                  data-isCurrentValue={value == framework.value}
+                  key={data.value}
+                  value={data.value}
+                  onSelect={handleSelect}
+                  data-iscurrentvalue={value == data.value}
                 >
-                  <Avatar className={'mr-1 h-8 w-8'}>
-                    <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-                    <AvatarFallback>{framework.label}</AvatarFallback>
-                  </Avatar>
-                  {framework.label}
+                  <ComboboxImage key={data.value} value={data} />
                 </CommandItem>
               ))}
             </CommandGroup>
