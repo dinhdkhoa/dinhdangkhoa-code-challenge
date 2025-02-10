@@ -1,5 +1,6 @@
 import { Db } from 'mongodb'
 import mongoDB from './mongoDB.config'
+import Token from '~/models/schemas/token.schema'
 
 export const collectionName = {
   token: 'token'
@@ -14,7 +15,7 @@ class CollectionManager {
   }
 
   static get token() {
-    return this.getCollection<any>(collectionName.token)
+    return this.getCollection<Token>(collectionName.token)
   }
 }
 
