@@ -16,7 +16,8 @@ export const http = async <ResponseType>({body,method , route} : RequestParams) 
   })
 
   if (!response.ok) {
-    throw new Error(response.statusText)
+    const errMsg = (response as any).message
+    throw new Error(errMsg)
   }
 
   const payload : {

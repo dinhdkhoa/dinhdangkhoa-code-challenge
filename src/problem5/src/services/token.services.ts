@@ -45,5 +45,5 @@ export const swapToken = async (from: SwapTokens, to: SwapTokens) => {
     throw new ErrorWithStatus({ status: HttpStatusCode.NotFound, message: `Can\'t find token ${to.currency}` })
 
   const exchangeAmount = (toToken!.price / fromToken!.price) * from.amount
-  return `You've successfully exchanged ${from.amount} ${from.currency} to ${exchangeAmount} ${to.currency}`
+  return `You've successfully exchanged ${from.amount} ${from.currency} to ${exchangeAmount.toFixed(3)} ${to.currency}`
 }

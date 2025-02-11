@@ -3,7 +3,7 @@ import { Button } from './ui/button'
 import { Combobox, ComboboxDataType } from './ui/combobox'
 import { Input } from './ui/input'
 import { Label } from './ui/label'
-import { ChangeEvent, FormEvent, useState } from 'react'
+import { ChangeEvent, FormEvent, useEffect, useState } from 'react'
 import InfoCard from './info-card'
 import { SwapTokensRequestBody, Token } from '@/types/token.types'
 import useSwapTokensMutation from '@/hooks/mutations/useSwapTokens.mutation'
@@ -16,9 +16,9 @@ export interface TokenState {
   currency?: string
 }
 
-const exchangeRateBasedOnTokens = (fromTokenAmount?: number, fromRate?: number, toRate?: number) => {
+const exchangeRateBasedOnTokens = (fromTokenAmount?: number, fromRate?: number, toRate?: number, prevValue?: number) => {
   if (fromTokenAmount == 0) return 0
-  if (!fromTokenAmount || !fromRate || !toRate) return
+  if (!fromTokenAmount || !fromRate || !toRate) return prevValue ? prevValue : undefined
   return Number((fromTokenAmount * (fromRate / toRate)).toFixed(3))
 }
 
@@ -33,13 +33,12 @@ function CurrencyConverter() {
     if (!comboboxData || comboboxData.length == 0) return
     const { currency, price } = token!
     if (type == 'to') {
-      const toTokenAmount = exchangeRateBasedOnTokens(fromToken?.amount, fromToken?.value, price)
       setToToken((prev) => {
         return {
           ...prev,
           value: price,
           currency,
-          amount: toTokenAmount
+          amount: exchangeRateBasedOnTokens(fromToken?.amount, fromToken?.value, price, prev?.amount)
         }
       })
       return
@@ -48,13 +47,8 @@ function CurrencyConverter() {
       return {
         ...prev,
         value: price,
-        currency
-      }
-    })
-    setToToken((prev) => {
-      return {
-        ...prev,
-        amount: exchangeRateBasedOnTokens(fromToken?.amount, price, prev?.value)
+        currency,
+        amount: exchangeRateBasedOnTokens(toToken?.amount,  toToken?.value,price, prev?.amount)
       }
     })
   }
@@ -71,7 +65,7 @@ function CurrencyConverter() {
       setFromToken((prev) => {
         return {
           ...prev,
-          amount: exchangeRateBasedOnTokens(amount, toToken?.value, prev?.value)
+          amount: exchangeRateBasedOnTokens(amount, toToken?.value, prev?.value, prev?.amount)
         }
       })
       return
@@ -79,7 +73,7 @@ function CurrencyConverter() {
     setToToken((prev) => {
       return {
         ...prev,
-        amount: exchangeRateBasedOnTokens(amount, fromToken?.value, prev?.value)
+        amount: exchangeRateBasedOnTokens(amount, fromToken?.value, prev?.value, prev?.amount)
       }
     })
     setFromToken((prev) => {
@@ -102,8 +96,13 @@ function CurrencyConverter() {
         currency: toToken!.currency!,
       }
     }
-    const res = await swapToken.mutateAsync(body)
+    const res = await swapToken.mutateAsync(body, {
+      onError(err) {
+        toast.error(err.message)
+      }
+    })
     if (res) toast.success(res.message)
+
   }
 
   return <fieldset disabled={isLoading || swapToken.isPending}>
