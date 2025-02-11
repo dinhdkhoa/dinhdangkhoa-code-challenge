@@ -1,10 +1,12 @@
-# 99Tech Code Challenge #1 #
+# 99Tech Code Challenge #1
 
-Note that if you fork this repository, your responses may be publicly linked to this repo.  
-Please submit your application along with the solutions attached or linked.   
+Run the project:
 
-It is important that you minimally attempt the problems, even if you do not arrive at a working solution.
+```
+docker compose up --build
+```
 
-## Submission ##
-You can either provide a link to an online repository, attach the solution in your application, or whichever method you prefer.
-We're cool as long as we can view your solution without any pain.
+Link to Frontend : [FE](http://localhost:3300/)
+
+Link to server : http://localhost:4000/
+You can find postman_collection.json in the problem5 folder.
