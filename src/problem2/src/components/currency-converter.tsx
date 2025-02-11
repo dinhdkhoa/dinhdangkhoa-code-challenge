@@ -3,9 +3,12 @@ import { Button } from './ui/button'
 import { Combobox, ComboboxDataType } from './ui/combobox'
 import { Input } from './ui/input'
 import { Label } from './ui/label'
-import { ChangeEvent, useState } from 'react'
+import { ChangeEvent, FormEvent, useState } from 'react'
 import InfoCard from './info-card'
-import { Token } from '@/types/token.types'
+import { SwapTokensRequestBody, Token } from '@/types/token.types'
+import useSwapTokensMutation from '@/hooks/mutations/useSwapTokens.mutation'
+import { toast } from 'sonner'
+import Spinner from './ui/spinner'
 
 export interface TokenState {
   value?: number,
@@ -20,7 +23,8 @@ const exchangeRateBasedOnTokens = (fromTokenAmount?: number, fromRate?: number, 
 }
 
 function CurrencyConverter() {
-  const { data: comboboxData } = useGetTokenCombobox()
+  const { data: comboboxData, isLoading } = useGetTokenCombobox()
+  const swapToken = useSwapTokensMutation()
 
   const [fromToken, setFromToken] = useState<TokenState>()
   const [toToken, setToToken] = useState<TokenState>()
@@ -29,25 +33,13 @@ function CurrencyConverter() {
     if (!comboboxData || comboboxData.length == 0) return
     const { currency, price } = token!
     if (type == 'to') {
+      const toTokenAmount = exchangeRateBasedOnTokens(fromToken?.amount, fromToken?.value, price)
       setToToken((prev) => {
-        console.log({
-          ...prev,
-          value: price,
-          currency,
-          amount: exchangeRateBasedOnTokens(fromToken?.amount, price, prev?.value)
-        })
-
         return {
           ...prev,
           value: price,
           currency,
-          amount: exchangeRateBasedOnTokens(fromToken?.amount, price, prev?.value)
-        }
-      })
-      setFromToken((prev) => {
-        return {
-          ...prev,
-          amount: exchangeRateBasedOnTokens(toToken?.amount, price, prev?.value)
+          amount: toTokenAmount
         }
       })
       return
@@ -98,58 +90,84 @@ function CurrencyConverter() {
     })
   }
 
-  return <form action="#" className="mt-8 grid grid-cols-6 gap-3">
-    <div className="col-span-6 sm:col-span-4">
-      <Label htmlFor="amountSend" className="block text-left text-sm font-semibold text-gray-700">
-        Amount To Send
-      </Label>
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    const body: SwapTokensRequestBody = {
+      from: {
+        amount: fromToken!.amount!,
+        currency: fromToken!.currency!,
+      },
+      to: {
+        amount: toToken!.amount!,
+        currency: toToken!.currency!,
+      }
+    }
+    const res = await swapToken.mutateAsync(body)
+    if (res) toast.success(res.message)
+  }
 
-      <Input
-        type="number"
-        id="amountSend"
-        name="amountSend"
-        value={fromToken?.amount}
-        className="shadow-xs mt-1 w-full rounded-md bg-white text-sm text-gray-700"
-        onChange={handleChangeTokenAmount('from')}
-      />
-    </div>
+  return <fieldset disabled={isLoading || swapToken.isPending}>
+    <form action="#" className="mt-8 grid grid-cols-6 gap-3" onSubmit={handleSubmit}>
+      <div className="col-span-6 sm:col-span-4">
+        <Label htmlFor="amountSend" className="block text-left text-sm font-semibold text-gray-700">
+          Amount To Send
+        </Label>
 
-    <div className="col-span-6 sm:col-span-1">
-      <Label htmlFor="Email" className="block text-left text-sm font-semibold text-gray-700">
-        From
-      </Label>
-      <Combobox className='mt-1' data={comboboxData || []} cb={handleSetToken('from')} />
-    </div>
-    <div className="col-span-6 sm:col-span-4">
-      <Label htmlFor="amountReceive" className="block text-left text-sm font-semibold text-gray-700">
-        Amount To Receive
-      </Label>
+        <Input
+          type="number"
+          id="amountSend"
+          min={0}
+          step="0.001"
+          required
+          name="amountSend"
+          value={fromToken?.amount || ''}
+          className="shadow-xs mt-1 w-full rounded-md bg-white text-sm text-gray-700"
+          onChange={handleChangeTokenAmount('from')}
+        />
+      </div>
 
-      <Input
-        type="number"
-        id="amountReceive"
-        name="amountReceive"
-        value={toToken?.amount}
-        onChange={handleChangeTokenAmount('to')}
-        className="shadow-xs mt-1 w-full rounded-md bg-white text-sm text-gray-700"
-      />
-    </div>
-    <div className="col-span-6 sm:col-span-1">
-      <Label htmlFor="Email" className="block text-left text-sm font-semibold text-gray-700">
-        To
-      </Label>
-      <Combobox className='mt-1' data={comboboxData || []} cb={handleSetToken('to')} />
-    </div>
-    <div className="col-span-6">
-      <InfoCard from={fromToken} to={toToken} />
-    </div>
+      <div className="col-span-6 sm:col-span-1">
+        <Label htmlFor="Email" className="block text-left text-sm font-semibold text-gray-700">
+          From
+        </Label>
+        <Combobox className='mt-1' data={comboboxData || []} cb={handleSetToken('from')} />
+      </div>
+      <div className="col-span-6 sm:col-span-4">
+        <Label htmlFor="amountReceive" className="block text-left text-sm font-semibold text-gray-700">
+          Amount To Receive
+        </Label>
 
-    <div className="col-span-6">
-      <Button className=" px-12 w-full py-3 text-sm transition" variant={'pink'}>
-        Confirm Swap
-      </Button>
-    </div>
-  </form>
+        <Input
+          type="number"
+          id="amountReceive"
+          name="amountReceive"
+          min={0}
+          step="0.001"
+          required
+          value={toToken?.amount || ''}
+          onChange={handleChangeTokenAmount('to')}
+          className="shadow-xs mt-1 w-full rounded-md bg-white text-sm text-gray-700"
+        />
+      </div>
+      <div className="col-span-6 sm:col-span-1">
+        <Label htmlFor="Email" className="block text-left text-sm font-semibold text-gray-700">
+          To
+        </Label>
+        <Combobox className='mt-1' data={comboboxData || []} cb={handleSetToken('to')} />
+      </div>
+      <div className="col-span-6">
+        <InfoCard from={fromToken} to={toToken} />
+      </div>
+
+      <div className="col-span-6">
+        <Button className=" px-12 w-full py-3 text-sm transition" variant={'pink'} type='submit'>
+          {
+            swapToken.isPending ? <Spinner color={'pink'} /> : 'Confirm Swap'
+          }
+        </Button>
+      </div>
+    </form>
+  </fieldset>
 }
 
 export default CurrencyConverter  

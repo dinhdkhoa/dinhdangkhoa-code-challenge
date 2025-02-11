@@ -13,7 +13,7 @@ router.get('', errorHandler(tokenControllers.getTokens))
 /**
  * Description: Add Token
  * Path: /:tweet_id
- * Method: GET
+ * Method: POST
  * Body: {
     currency?: string;
     price?: number;
@@ -21,6 +21,12 @@ router.get('', errorHandler(tokenControllers.getTokens))
   } 
  */
 router.post('/', tokenControllers.addTokenValidator, errorHandler(tokenControllers.addToken))
+/**
+ * Description: Swap Token Confirm
+ * Path: /swap
+ * Method: POST
+ */
+router.post('/swap', errorHandler(tokenControllers.swapToken))
 /**
  * Description: Update Token
  * Path: /:tokenId

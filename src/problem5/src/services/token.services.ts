@@ -2,7 +2,7 @@ import { ObjectId } from 'mongodb'
 import { HttpStatusCode } from '~/constants/HttpStatusCode.enum'
 import collections from '~/database/collections'
 import { ErrorWithStatus } from '~/models/errors.model'
-import Token, { TokenRequestBody } from '~/models/schemas/token.schema'
+import Token, { SwapTokens, TokenRequestBody } from '~/models/schemas/token.schema'
 
 export const getTokens = async () => {
   const tokens = await collections.token.find().toArray()
@@ -31,5 +31,19 @@ export const updateToken = async (body: Partial<TokenRequestBody>, id: string) =
 }
 export const deleteToken = async (id: string) => {
   const res = await collections.token.findOneAndDelete({ _id: new ObjectId(id) })
-  return res
+  if (res) return res
+  throw new ErrorWithStatus({ status: HttpStatusCode.NotFound, message: `Can\'t find token` })
+}
+
+export const swapToken = async (from: SwapTokens, to: SwapTokens) => {
+  const fromToken = await collections.token.findOne({ currency: from.currency })
+  if (!Boolean(fromToken))
+    throw new ErrorWithStatus({ status: HttpStatusCode.NotFound, message: `Can\'t find token ${from.currency}` })
+
+  const toToken = await collections.token.findOne({ currency: to.currency })
+  if (!Boolean(toToken))
+    throw new ErrorWithStatus({ status: HttpStatusCode.NotFound, message: `Can\'t find token ${to.currency}` })
+
+  const exchangeAmount = (toToken!.price / fromToken!.price) * from.amount
+  return `You've successfully exchanged ${from.amount} ${from.currency} to ${exchangeAmount} ${to.currency}`
 }

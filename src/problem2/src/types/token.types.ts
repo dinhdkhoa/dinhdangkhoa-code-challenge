@@ -5,3 +5,11 @@ export interface Token {
   price: number
   image?: string 
 }
+export interface SwapTokens {
+  amount: number
+  currency: string
+}
+export type SwapTokensRequestBody = {
+  from: SwapTokens
+  to: SwapTokens
+}

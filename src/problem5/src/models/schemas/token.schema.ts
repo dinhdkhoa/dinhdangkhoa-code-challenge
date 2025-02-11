@@ -7,6 +7,14 @@ interface TokenInterface extends GetMockDataResType {
 }
 
 export type TokenRequestBody = Pick<TokenInterface, 'currency' | 'price' | 'image'>
+export interface SwapTokens {
+  amount: number
+  currency: string
+}
+export type SwapTokensRequestBody = {
+  from: SwapTokens
+  to: SwapTokens
+}
 
 export default class Token {
   _id: ObjectId

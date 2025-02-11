@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 import { ParamsDictionary } from 'express-serve-static-core'
 import { checkSchema, Schema } from 'express-validator'
-import Token, { TokenRequestBody } from '~/models/schemas/token.schema'
+import Token, { SwapTokensRequestBody, TokenRequestBody } from '~/models/schemas/token.schema'
 import { TokenServices } from '~/services'
 import validate from '~/utils/validator'
 
@@ -59,4 +59,10 @@ export const updateToken = async (
 export const deleteToken = async (request: Request<{ tokenId: string }>, res: Response) => {
   const data = await TokenServices.deleteToken(request.params.tokenId)
   res.json({ message: 'Delete Token Successfully ', data })
+}
+
+export const swapToken = async (request: Request<ParamsDictionary, {}, SwapTokensRequestBody>, res: Response) => {
+  const { from, to } = request.body
+  const data = await TokenServices.swapToken(from, to)
+  res.json({ message: data })
 }

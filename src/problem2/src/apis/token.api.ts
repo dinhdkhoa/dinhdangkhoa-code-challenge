@@ -1,9 +1,10 @@
 import { ComboboxDataType } from "@/components/ui/combobox"
 import { http } from "@/lib/http"
-import { Token } from "@/types/token.types"
+import { SwapTokensRequestBody, Token } from "@/types/token.types"
 
 const tokenURL = {
   token: 'token',
+  swapToken: 'token/swap',
   
 } as const
 
@@ -25,7 +26,18 @@ const tokenApi = {
           return comboboxData
         })
       }
-    )
+    ),
+    swapTokens: async (body: SwapTokensRequestBody) => await http({
+    method: "POST",
+    route: tokenURL.swapToken,
+    body
+    }).then(res => {
+      return new Promise<typeof res>((resolve) => {
+        setTimeout(() => {
+          resolve(res)
+        }, 5000);
+      }) 
+    })
 }
 
 export default tokenApi
